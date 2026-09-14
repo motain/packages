@@ -1,0 +1,26 @@
+name: packages
+id: ari:cloud:compass:fca6a80f-888b-4079-82e6-3c2f61c788e2:component/4d010f50-96c4-48c0-bab5-a3dd5112b464/4112505a-c33d-4955-9cfb-b032a9589527
+description: Fork of a collection of useful packages maintained by the Flutter team
+configVersion: 1
+typeId: SERVICE
+fields:
+  tier: 4
+links:
+  - name: null
+    type: REPOSITORY
+    url: https://github.com/motain/packages
+relationships:
+  DEPENDS_ON: []
+labels:
+  - source:github
+  - synced-with-jsm
+customFields:
+  - name: Business Score (C / H / M / L)
+    type: text
+    value: null
+  - name: MonorepoPath
+    type: text
+    value: null
+  - name: MultiArch
+    type: boolean
+    value: false
