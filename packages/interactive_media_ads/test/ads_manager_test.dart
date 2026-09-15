@@ -76,6 +76,17 @@ void main() {
     await manager.skip();
   });
 
+  test('setVolume', () async {
+    final platformManager = TestAdsManager(
+      onSetVolume: expectAsync1((double volume) async {
+        expect(volume, 0);
+      }),
+    );
+
+    final AdsManager manager = createAdsManager(platformManager);
+    await manager.setVolume(0);
+  });
+
   test('destroy', () async {
     final platformManager = TestAdsManager(onDestroy: expectAsync0(() async {}));
 

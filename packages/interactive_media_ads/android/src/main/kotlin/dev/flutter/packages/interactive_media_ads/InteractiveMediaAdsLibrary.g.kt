@@ -4239,6 +4239,17 @@ abstract class PigeonApiMediaPlayer(
   /** Stops playback after playback has been started or paused. */
   abstract fun stop(pigeon_instance: android.media.MediaPlayer)
 
+  /**
+   * Sets the volume on this player.
+   *
+   * Both values are in the range 0.0 (silence) to 1.0 (nominal volume).
+   */
+  abstract fun setVolume(
+      pigeon_instance: android.media.MediaPlayer,
+      leftVolume: Double,
+      rightVolume: Double
+  )
+
   companion object {
     @Suppress("LocalVariableName")
     fun setUpMessageHandlers(binaryMessenger: BinaryMessenger, api: PigeonApiMediaPlayer?) {
@@ -4346,6 +4357,31 @@ abstract class PigeonApiMediaPlayer(
             val wrapped: List<Any?> =
                 try {
                   api.stop(pigeon_instanceArg)
+                  listOf(null)
+                } catch (exception: Throwable) {
+                  InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
+                }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel =
+            BasicMessageChannel<Any?>(
+                binaryMessenger,
+                "dev.flutter.pigeon.interactive_media_ads.MediaPlayer.setVolume",
+                codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val pigeon_instanceArg = args[0] as android.media.MediaPlayer
+            val leftVolumeArg = args[1] as Double
+            val rightVolumeArg = args[2] as Double
+            val wrapped: List<Any?> =
+                try {
+                  api.setVolume(pigeon_instanceArg, leftVolumeArg, rightVolumeArg)
                   listOf(null)
                 } catch (exception: Throwable) {
                   InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)

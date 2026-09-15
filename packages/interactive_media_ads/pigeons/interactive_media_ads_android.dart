@@ -767,6 +767,11 @@ abstract class MediaPlayer {
 
   /// Stops playback after playback has been started or paused.
   void stop();
+
+  /// Sets the volume on this player.
+  ///
+  /// Both values are in the range 0.0 (silence) to 1.0 (nominal volume).
+  void setVolume(double leftVolume, double rightVolume);
 }
 
 /// Callbacks that the player must fire.

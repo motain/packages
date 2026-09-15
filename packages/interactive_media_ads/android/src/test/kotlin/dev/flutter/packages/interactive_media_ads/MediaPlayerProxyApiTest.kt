@@ -61,4 +61,14 @@ class MediaPlayerProxyApiTest {
 
     verify(instance).stop()
   }
+
+  @Test
+  fun setVolume() {
+    val api = TestProxyApiRegistrar().getPigeonApiMediaPlayer()
+
+    val instance = mock<MediaPlayer>()
+    api.setVolume(instance, 0.3, 0.7)
+
+    verify(instance).setVolume(0.3f, 0.7f)
+  }
 }

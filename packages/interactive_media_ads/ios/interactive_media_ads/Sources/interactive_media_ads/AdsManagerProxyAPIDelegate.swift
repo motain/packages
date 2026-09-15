@@ -44,6 +44,12 @@ class AdsManagerProxyAPIDelegate: PigeonApiDelegateIMAAdsManager {
     pigeonInstance.resume()
   }
 
+  func setVolume(pigeonApi: PigeonApiIMAAdsManager, pigeonInstance: IMAAdsManager, volume: Double)
+    throws
+  {
+    pigeonInstance.volume = Float(volume)
+  }
+
   func destroy(pigeonApi: PigeonApiIMAAdsManager, pigeonInstance: IMAAdsManager) throws {
     pigeonInstance.destroy()
   }

@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:interactive_media_ads/src/android/android_ad_display_container.dart';
 import 'package:interactive_media_ads/src/android/android_ads_manager.dart';
 import 'package:interactive_media_ads/src/android/android_ads_manager_delegate.dart';
 import 'package:interactive_media_ads/src/android/android_ads_rendering_settings.dart';
@@ -14,6 +15,10 @@ import 'package:mockito/mockito.dart';
 import 'ads_manager_test.mocks.dart';
 
 @GenerateNiceMocks(<MockSpec<Object>>[
+  MockSpec<ima.FrameLayout>(),
+  MockSpec<ima.MediaPlayer>(),
+  MockSpec<ima.VideoAdPlayer>(),
+  MockSpec<ima.VideoView>(),
   MockSpec<ima.AdError>(),
   MockSpec<ima.AdErrorEvent>(),
   MockSpec<ima.AdErrorListener>(),
@@ -28,10 +33,32 @@ void main() {
     ima.PigeonOverrides.pigeon_reset();
   });
 
+  // `AndroidAdDisplayContainer` is a `base` class, so mockito cannot mock it.
+  // These overrides are the minimum its constructor needs to build without a
+  // platform view.
+  AndroidAdDisplayContainer testContainer() {
+    ima.PigeonOverrides.frameLayout_new = () => MockFrameLayout();
+    ima.PigeonOverrides.videoView_new =
+        ({required dynamic onError, dynamic onPrepared, dynamic onCompletion}) => MockVideoView();
+    ima.PigeonOverrides.videoAdPlayer_new =
+        ({
+          required dynamic addCallback,
+          required dynamic loadAd,
+          required dynamic pauseAd,
+          required dynamic playAd,
+          required dynamic release,
+          required dynamic removeCallback,
+          required dynamic stopAd,
+        }) => MockVideoAdPlayer();
+    return AndroidAdDisplayContainer(
+      AndroidAdDisplayContainerCreationParams(onContainerAdded: (_) {}),
+    );
+  }
+
   group('AndroidAdsManager', () {
     test('destroy', () {
       final mockAdsManager = MockAdsManager();
-      final adsManager = AndroidAdsManager(mockAdsManager);
+      final adsManager = AndroidAdsManager(mockAdsManager, testContainer());
       adsManager.destroy();
 
       verify(mockAdsManager.destroy());
@@ -46,7 +73,7 @@ void main() {
         mockImaSdkFactory.createAdsRenderingSettings(),
       ).thenAnswer((_) => Future<ima.AdsRenderingSettings>.value(mockAdsRenderingSettings));
 
-      final adsManager = AndroidAdsManager(mockAdsManager);
+      final adsManager = AndroidAdsManager(mockAdsManager, testContainer());
 
       ima.PigeonOverrides.imaSdkFactory_instance = mockImaSdkFactory;
       final settings = AndroidAdsRenderingSettings(
@@ -76,7 +103,7 @@ void main() {
 
     test('start', () {
       final mockAdsManager = MockAdsManager();
-      final adsManager = AndroidAdsManager(mockAdsManager);
+      final adsManager = AndroidAdsManager(mockAdsManager, testContainer());
       adsManager.start(AdsManagerStartParams());
 
       verify(mockAdsManager.start());
@@ -84,7 +111,7 @@ void main() {
 
     test('discardAdBreak', () {
       final mockAdsManager = MockAdsManager();
-      final adsManager = AndroidAdsManager(mockAdsManager);
+      final adsManager = AndroidAdsManager(mockAdsManager, testContainer());
       adsManager.discardAdBreak();
 
       verify(mockAdsManager.discardAdBreak());
@@ -92,15 +119,52 @@ void main() {
 
     test('pause', () {
       final mockAdsManager = MockAdsManager();
-      final adsManager = AndroidAdsManager(mockAdsManager);
+      final adsManager = AndroidAdsManager(mockAdsManager, testContainer());
       adsManager.pause();
 
       verify(mockAdsManager.pause());
     });
 
+    test('setVolume reaches the media player through the display container', () async {
+      late final Future<void> Function(ima.VideoView, ima.MediaPlayer) onPreparedCallback;
+
+      ima.PigeonOverrides.frameLayout_new = () => MockFrameLayout();
+      ima.PigeonOverrides.videoView_new =
+          ({
+            required dynamic onError,
+            Future<void> Function(ima.VideoView, ima.MediaPlayer)? onPrepared,
+            dynamic onCompletion,
+          }) {
+            onPreparedCallback = onPrepared!;
+            return MockVideoView();
+          };
+      ima.PigeonOverrides.videoAdPlayer_new =
+          ({
+            required dynamic addCallback,
+            required dynamic loadAd,
+            required dynamic pauseAd,
+            required dynamic playAd,
+            required dynamic release,
+            required dynamic removeCallback,
+            required dynamic stopAd,
+          }) => MockVideoAdPlayer();
+
+      final container = AndroidAdDisplayContainer(
+        AndroidAdDisplayContainerCreationParams(onContainerAdded: (_) {}),
+      );
+      final adsManager = AndroidAdsManager(MockAdsManager(), container);
+
+      await adsManager.setVolume(0);
+
+      final mediaPlayer = MockMediaPlayer();
+      await onPreparedCallback(MockVideoView(), mediaPlayer);
+
+      verify(mediaPlayer.setVolume(0, 0));
+    });
+
     test('skip', () {
       final mockAdsManager = MockAdsManager();
-      final adsManager = AndroidAdsManager(mockAdsManager);
+      final adsManager = AndroidAdsManager(mockAdsManager, testContainer());
       adsManager.skip();
 
       verify(mockAdsManager.skip());
@@ -108,7 +172,7 @@ void main() {
 
     test('resume', () {
       final mockAdsManager = MockAdsManager();
-      final adsManager = AndroidAdsManager(mockAdsManager);
+      final adsManager = AndroidAdsManager(mockAdsManager, testContainer());
       adsManager.resume();
 
       verify(mockAdsManager.resume());
@@ -128,7 +192,7 @@ void main() {
         return MockAdErrorListener();
       };
 
-      final adsManager = AndroidAdsManager(mockAdsManager);
+      final adsManager = AndroidAdsManager(mockAdsManager, testContainer());
       await adsManager.setAdsManagerDelegate(
         AndroidAdsManagerDelegate(
           PlatformAdsManagerDelegateCreationParams(
@@ -160,7 +224,7 @@ void main() {
             return MockAdErrorListener();
           };
 
-      final adsManager = AndroidAdsManager(mockAdsManager);
+      final adsManager = AndroidAdsManager(mockAdsManager, testContainer());
       await adsManager.setAdsManagerDelegate(
         AndroidAdsManagerDelegate(
           PlatformAdsManagerDelegateCreationParams(onAdErrorEvent: expectAsync1((_) {})),
@@ -181,7 +245,7 @@ void main() {
 
       final cuePoints = <double>[1.0];
       when(mockAdsManager.adCuePoints).thenReturn(cuePoints);
-      final adsManager = AndroidAdsManager(mockAdsManager);
+      final adsManager = AndroidAdsManager(mockAdsManager, testContainer());
 
       expect(adsManager.adCuePoints, <Duration>[const Duration(seconds: 1)]);
     });

@@ -275,6 +275,101 @@ void main() {
       verify(mockPlayerCallback.onAdProgress(mockAdMediaInfo, any));
     });
 
+    test('setVolume is applied to the media player of every ad', () async {
+      late final Future<void> Function(ima.VideoView, ima.MediaPlayer) onPreparedCallback;
+
+      ima.PigeonOverrides.frameLayout_new = () => MockFrameLayout();
+      ima.PigeonOverrides.videoView_new =
+          ({
+            required dynamic onError,
+            Future<void> Function(ima.VideoView, ima.MediaPlayer)? onPrepared,
+            dynamic onCompletion,
+          }) {
+            onPreparedCallback = onPrepared!;
+            return MockVideoView();
+          };
+      ima.PigeonOverrides.imaSdkFactory_createAdDisplayContainer = (_, _) async {
+        return MockAdDisplayContainer();
+      };
+      ima.PigeonOverrides.videoAdPlayer_new =
+          ({
+            required dynamic addCallback,
+            required dynamic loadAd,
+            required dynamic pauseAd,
+            required dynamic playAd,
+            required dynamic release,
+            required dynamic removeCallback,
+            required dynamic stopAd,
+          }) => MockVideoAdPlayer();
+
+      final container = AndroidAdDisplayContainer(
+        AndroidAdDisplayContainerCreationParams(onContainerAdded: (_) {}),
+      );
+
+      // Muted before any ad has been prepared, so this only has an effect if
+      // the value is stored and re-applied per ad.
+      await container.setVolume(0);
+
+      final firstAdPlayer = MockMediaPlayer();
+      await onPreparedCallback(MockVideoView(), firstAdPlayer);
+      verify(firstAdPlayer.setVolume(0, 0));
+
+      // The MediaPlayer is recreated for each ad in a pod, so the volume must
+      // be applied again rather than only to the player that was current when
+      // setVolume was called.
+      final secondAdPlayer = MockMediaPlayer();
+      await onPreparedCallback(MockVideoView(), secondAdPlayer);
+      verify(secondAdPlayer.setVolume(0, 0));
+    });
+
+    test('setVolume updates the VideoAdPlayer and notifies onVolumeChanged for '
+        'the active ad', () async {
+      late final void Function(ima.VideoAdPlayer, ima.AdMediaInfo, ima.AdPodInfo) loadAdCallback;
+
+      late final void Function(ima.VideoAdPlayer, ima.VideoAdPlayerCallback) addCallbackCallback;
+
+      final mockVideoAdPlayer = MockVideoAdPlayer();
+
+      ima.PigeonOverrides.frameLayout_new = () => MockFrameLayout();
+      ima.PigeonOverrides.videoView_new =
+          ({required dynamic onError, dynamic onPrepared, dynamic onCompletion}) => MockVideoView();
+      ima.PigeonOverrides.imaSdkFactory_createAdDisplayContainer = (_, _) async {
+        return MockAdDisplayContainer();
+      };
+      ima.PigeonOverrides.videoAdPlayer_new =
+          ({
+            required void Function(ima.VideoAdPlayer, ima.VideoAdPlayerCallback) addCallback,
+            required void Function(ima.VideoAdPlayer, ima.AdMediaInfo, ima.AdPodInfo) loadAd,
+            required dynamic pauseAd,
+            required dynamic playAd,
+            required dynamic release,
+            required dynamic removeCallback,
+            required dynamic stopAd,
+          }) {
+            loadAdCallback = loadAd;
+            addCallbackCallback = addCallback;
+            return mockVideoAdPlayer;
+          };
+
+      final container = AndroidAdDisplayContainer(
+        AndroidAdDisplayContainerCreationParams(onContainerAdded: (_) {}),
+      );
+
+      final ima.AdMediaInfo mockAdMediaInfo = MockAdMediaInfo();
+      loadAdCallback(MockVideoAdPlayer(), mockAdMediaInfo, MockAdPodInfo());
+
+      final mockPlayerCallback = MockVideoAdPlayerCallback();
+      addCallbackCallback(MockVideoAdPlayer(), mockPlayerCallback);
+
+      await container.setVolume(0.5);
+
+      // The IMA SDK reads the ad player volume as a 0-100 percentage for
+      // audibility reporting, so the 0-1 value is converted and pushed to the
+      // `VideoAdPlayer` and its callbacks, not only to the `MediaPlayer`.
+      verify(mockVideoAdPlayer.setVolume(50));
+      verify(mockPlayerCallback.onVolumeChanged(mockAdMediaInfo, 50));
+    });
+
     test('pause ad', () async {
       late final void Function(ima.VideoAdPlayer, ima.AdMediaInfo, ima.AdPodInfo) loadAdCallback;
 

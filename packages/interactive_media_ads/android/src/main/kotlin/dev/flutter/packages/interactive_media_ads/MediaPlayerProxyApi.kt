@@ -33,4 +33,8 @@ class MediaPlayerProxyApi(override val pigeonRegistrar: ProxyApiRegistrar) :
   override fun stop(pigeon_instance: MediaPlayer) {
     pigeon_instance.stop()
   }
+
+  override fun setVolume(pigeon_instance: MediaPlayer, leftVolume: Double, rightVolume: Double) {
+    pigeon_instance.setVolume(leftVolume.toFloat(), rightVolume.toFloat())
+  }
 }

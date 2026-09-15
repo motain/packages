@@ -103,6 +103,14 @@ void main() {
       verify(mockAdsManager.resume());
     });
 
+    test('setVolume', () {
+      final mockAdsManager = MockIMAAdsManager();
+      final adsManager = IOSAdsManager(mockAdsManager);
+      adsManager.setVolume(0.0);
+
+      verify(mockAdsManager.setVolume(0.0));
+    });
+
     test('setAdsManagerDelegate', () {
       final mockAdsManager = MockIMAAdsManager();
       final adsManager = IOSAdsManager(mockAdsManager);

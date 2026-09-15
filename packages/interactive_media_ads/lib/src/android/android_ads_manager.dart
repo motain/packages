@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:meta/meta.dart';
 
 import '../platform_interface/platform_interface.dart';
+import 'android_ad_display_container.dart';
 import 'android_ads_rendering_settings.dart';
 import 'enum_converter_utils.dart';
 import 'interactive_media_ads.g.dart' as ima;
@@ -15,8 +16,9 @@ import 'interactive_media_ads.g.dart' as ima;
 class AndroidAdsManager extends PlatformAdsManager {
   /// Constructs an [AndroidAdsManager].
   @internal
-  AndroidAdsManager(ima.AdsManager manager)
+  AndroidAdsManager(ima.AdsManager manager, AndroidAdDisplayContainer container)
     : _manager = manager,
+      _container = container,
       super(
         adCuePoints: List<Duration>.unmodifiable(
           manager.adCuePoints.map((double seconds) {
@@ -26,6 +28,10 @@ class AndroidAdsManager extends PlatformAdsManager {
       );
 
   final ima.AdsManager _manager;
+
+  // On Android the IMA SDK does not own the ad player -- the display container
+  // does -- so ad volume is applied there rather than through `_manager`.
+  final AndroidAdDisplayContainer _container;
 
   PlatformAdsManagerDelegate? _managerDelegate;
 
@@ -75,6 +81,11 @@ class AndroidAdsManager extends PlatformAdsManager {
   @override
   Future<void> skip() {
     return _manager.skip();
+  }
+
+  @override
+  Future<void> setVolume(double volume) {
+    return _container.setVolume(volume);
   }
 
   // This value is created in a static method because the callback methods for

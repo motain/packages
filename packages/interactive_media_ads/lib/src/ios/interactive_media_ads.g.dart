@@ -3152,6 +3152,26 @@ class IMAAdsManager extends NSObject {
     _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
   }
 
+  /// Set the volume for the current ad.
+  ///
+  /// From 0 (muted) to 1 (loudest). This volume is relative to device volume,
+  /// not absolute.
+  Future<void> setVolume(double volume) async {
+    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecIMAAdsManager;
+    final BinaryMessenger? pigeonVar_binaryMessenger = pigeon_binaryMessenger;
+    const pigeonVar_channelName =
+        'dev.flutter.pigeon.interactive_media_ads.IMAAdsManager.setVolume';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[this, volume]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
   /// Skips the advertisement if the ad is skippable and the skip offset has
   /// been reached.
   Future<void> skip() async {

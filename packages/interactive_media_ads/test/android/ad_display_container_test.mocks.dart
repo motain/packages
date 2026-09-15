@@ -3,6 +3,7 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+
 import 'dart:async' as _i5;
 import 'dart:ui' as _i3;
 
@@ -607,6 +608,15 @@ class MockMediaPlayer extends _i1.Mock implements _i2.MediaPlayer {
   _i5.Future<void> stop() =>
       (super.noSuchMethod(
             Invocation.method(#stop, []),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> setVolume(double? leftVolume, double? rightVolume) =>
+      (super.noSuchMethod(
+            Invocation.method(#setVolume, [leftVolume, rightVolume]),
             returnValue: _i5.Future<void>.value(),
             returnValueForMissingStub: _i5.Future<void>.value(),
           )

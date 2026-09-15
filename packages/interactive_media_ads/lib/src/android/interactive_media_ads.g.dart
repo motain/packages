@@ -3848,6 +3848,28 @@ class MediaPlayer extends PigeonInternalProxyApiBaseClass {
     _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
   }
 
+  /// Sets the volume on this player.
+  ///
+  /// Both values are in the range 0.0 (silence) to 1.0 (nominal volume).
+  Future<void> setVolume(double leftVolume, double rightVolume) async {
+    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecMediaPlayer;
+    final BinaryMessenger? pigeonVar_binaryMessenger = pigeon_binaryMessenger;
+    const pigeonVar_channelName = 'dev.flutter.pigeon.interactive_media_ads.MediaPlayer.setVolume';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[
+      this,
+      leftVolume,
+      rightVolume,
+    ]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
   @override
   MediaPlayer pigeon_copy() {
     return MediaPlayer.pigeon_detached(

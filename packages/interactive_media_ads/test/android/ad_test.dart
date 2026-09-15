@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:interactive_media_ads/src/android/android_ad_display_container.dart';
 import 'package:interactive_media_ads/src/android/android_ads_manager.dart';
 import 'package:interactive_media_ads/src/android/android_ads_manager_delegate.dart';
 import 'package:interactive_media_ads/src/android/interactive_media_ads.g.dart' as ima;
@@ -14,11 +15,36 @@ import 'ad_test.mocks.dart';
 
 @GenerateNiceMocks(<MockSpec<Object>>[
   MockSpec<ima.AdsManager>(),
+  MockSpec<ima.FrameLayout>(),
+  MockSpec<ima.VideoAdPlayer>(),
+  MockSpec<ima.VideoView>(),
   MockSpec<ima.AdEvent>(),
   MockSpec<ima.AdEventListener>(),
   MockSpec<ima.AdErrorListener>(),
 ])
 void main() {
+  // `AndroidAdDisplayContainer` is a `base` class, so mockito cannot mock it.
+  // These overrides are the minimum its constructor needs to build without a
+  // platform view.
+  AndroidAdDisplayContainer testContainer() {
+    ima.PigeonOverrides.frameLayout_new = () => MockFrameLayout();
+    ima.PigeonOverrides.videoView_new =
+        ({required dynamic onError, dynamic onPrepared, dynamic onCompletion}) => MockVideoView();
+    ima.PigeonOverrides.videoAdPlayer_new =
+        ({
+          required dynamic addCallback,
+          required dynamic loadAd,
+          required dynamic pauseAd,
+          required dynamic playAd,
+          required dynamic release,
+          required dynamic removeCallback,
+          required dynamic stopAd,
+        }) => MockVideoAdPlayer();
+    return AndroidAdDisplayContainer(
+      AndroidAdDisplayContainerCreationParams(onContainerAdded: (_) {}),
+    );
+  }
+
   group('Ad', () {
     setUp(() {
       ima.PigeonOverrides.pigeon_reset();
@@ -40,7 +66,7 @@ void main() {
             return MockAdErrorListener();
           };
 
-      final adsManager = AndroidAdsManager(mockAdsManager);
+      final adsManager = AndroidAdsManager(mockAdsManager, testContainer());
 
       await adsManager.setAdsManagerDelegate(
         AndroidAdsManagerDelegate(
@@ -82,7 +108,7 @@ void main() {
             return MockAdErrorListener();
           };
 
-      final adsManager = AndroidAdsManager(mockAdsManager);
+      final adsManager = AndroidAdsManager(mockAdsManager, testContainer());
 
       await adsManager.setAdsManagerDelegate(
         AndroidAdsManagerDelegate(
@@ -122,7 +148,7 @@ void main() {
             return MockAdErrorListener();
           };
 
-      final adsManager = AndroidAdsManager(mockAdsManager);
+      final adsManager = AndroidAdsManager(mockAdsManager, testContainer());
 
       await adsManager.setAdsManagerDelegate(
         AndroidAdsManagerDelegate(

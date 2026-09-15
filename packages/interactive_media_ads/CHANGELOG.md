@@ -1,3 +1,7 @@
+## 0.3.1
+
+* Adds support for setting the volume of ads. See `AdsManager.setVolume`.
+
 ## 0.3.0+17
 
 * Updates pigeon dev_dependency to ^27.3.2 for analyzer 14 compatibility.

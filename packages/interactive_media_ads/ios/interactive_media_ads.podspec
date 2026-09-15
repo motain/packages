@@ -17,7 +17,7 @@ Downloaded by pub (not CocoaPods).
   s.source_files = 'interactive_media_ads/Sources/interactive_media_ads/**/*.swift'
   s.dependency 'Flutter'
   # 3.28.10 requires iOS 15+.
-  s.dependency 'GoogleAds-IMA-iOS-SDK', '>= 3.23', '< 3.28.10'
+  s.dependency 'GoogleAds-IMA-iOS-SDK', '>= 3.23', '< 4.0.0'
   s.platform = :ios, '13.0'
 
   # Flutter.framework does not contain a i386 slice.

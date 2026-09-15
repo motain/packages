@@ -81,6 +81,12 @@ base class AndroidAdDisplayContainer extends PlatformAdDisplayContainer {
   // playback.
   ima.MediaPlayer? _mediaPlayer;
 
+  // Volume applied to every ad, from 0 (silent) to 1 (nominal). Stored rather
+  // than written straight through to the `MediaPlayer` because that player is
+  // recreated for each ad in a pod, and because it does not exist at all until
+  // the first ad is prepared.
+  double _volume = 1.0;
+
   /// Methods that must be triggered to update the IMA SDK of the state of
   /// playback of an ad.
   @internal
@@ -129,6 +135,33 @@ base class AndroidAdDisplayContainer extends PlatformAdDisplayContainer {
   @override
   Widget build(BuildContext context) {
     return _AdPlayer(this);
+  }
+
+  /// Sets the volume for ads played in this container.
+  ///
+  /// [volume] ranges from 0 (silent) to 1 (nominal volume). The value is
+  /// remembered and re-applied to every subsequent ad, so it can be set before
+  /// any ad has been prepared.
+  ///
+  /// On Android the IMA SDK does not own the ad player -- this container does
+  /// -- so this, and not `AdsManager`, is where ad volume is controlled.
+  @internal
+  Future<void> setVolume(double volume) async {
+    _volume = volume;
+
+    // The IMA SDK reads the ad player's volume as a 0-100 percentage (via
+    // `VideoAdPlayer.getVolume`) for audibility reporting, so it must be kept
+    // in sync with the audible volume applied to the `MediaPlayer`.
+    final int percentage = (volume * 100).round();
+
+    await Future.wait(<Future<void>>[
+      if (_mediaPlayer case final ima.MediaPlayer player) player.setVolume(volume, volume),
+      _videoAdPlayer.setVolume(percentage),
+      if (_loadedAdMediaInfoQueue.firstOrNull case final ima.AdMediaInfo adMediaInfo)
+        ...videoAdPlayerCallbacks.map(
+          (ima.VideoAdPlayerCallback callback) => callback.onVolumeChanged(adMediaInfo, percentage),
+        ),
+    ]);
   }
 
   // Clears the current `MediaPlayer` and resets any saved position of an ad.
@@ -232,6 +265,7 @@ base class AndroidAdDisplayContainer extends PlatformAdDisplayContainer {
         final AndroidAdDisplayContainer? container = weakThis.target;
         if (container != null) {
           container._mediaPlayer = player;
+          await player.setVolume(container._volume, container._volume);
           container._adDuration = await player.getDuration();
           if (container._savedAdPosition > 0) {
             await player.seekTo(container._savedAdPosition);

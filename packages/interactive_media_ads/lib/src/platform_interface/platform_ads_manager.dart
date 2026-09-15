@@ -37,6 +37,13 @@ abstract class PlatformAdsManager {
   /// Resumes the current ad.
   Future<void> resume();
 
+  /// Sets the volume for the current ad.
+  ///
+  /// [volume] ranges from 0 (muted) to 1 (nominal volume), relative to the
+  /// device volume. The value is remembered and applied to subsequent ads, so
+  /// it may be set before an ad has started.
+  Future<void> setVolume(double volume);
+
   /// Skips the current ad.
   ///
   /// This only skips ads if IMA does not render the 'Skip ad' button.

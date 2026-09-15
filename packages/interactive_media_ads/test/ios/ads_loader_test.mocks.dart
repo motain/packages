@@ -3,6 +3,7 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+
 import 'dart:async' as _i3;
 
 import 'package:interactive_media_ads/src/ios/interactive_media_ads.g.dart' as _i2;
@@ -341,6 +342,15 @@ class MockIMAAdsManager extends _i1.Mock implements _i2.IMAAdsManager {
   _i3.Future<void> resume() =>
       (super.noSuchMethod(
             Invocation.method(#resume, []),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> setVolume(double? volume) =>
+      (super.noSuchMethod(
+            Invocation.method(#setVolume, [volume]),
             returnValue: _i3.Future<void>.value(),
             returnValueForMissingStub: _i3.Future<void>.value(),
           )

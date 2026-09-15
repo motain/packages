@@ -187,6 +187,15 @@ class AdsManager {
     return platform.skip();
   }
 
+  /// Sets the volume for the current ad.
+  ///
+  /// [volume] ranges from 0 (muted) to 1 (nominal volume), relative to the
+  /// device volume. The value is remembered and applied to subsequent ads, so
+  /// it may be set before an ad has started.
+  Future<void> setVolume(double volume) {
+    return platform.setVolume(volume);
+  }
+
   /// Discards current ad break and resumes content.
   ///
   /// If there is no current ad then the next ad break is discarded.

@@ -645,6 +645,12 @@ abstract class IMAAdsManager extends NSObject {
   /// Resumes the current ad.
   void resume();
 
+  /// Set the volume for the current ad.
+  ///
+  /// From 0 (muted) to 1 (loudest). This volume is relative to device volume,
+  /// not absolute.
+  void setVolume(double volume);
+
   /// Skips the advertisement if the ad is skippable and the skip offset has
   /// been reached.
   void skip();

@@ -81,6 +81,11 @@ class IOSAdsManager extends PlatformAdsManager {
   }
 
   @override
+  Future<void> setVolume(double volume) {
+    return _manager.setVolume(volume);
+  }
+
+  @override
   Future<void> skip() {
     return _manager.skip();
   }
