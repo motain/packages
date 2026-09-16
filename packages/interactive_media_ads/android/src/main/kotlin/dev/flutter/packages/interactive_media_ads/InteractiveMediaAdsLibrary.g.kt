@@ -615,12 +615,6 @@ abstract class InteractiveMediaAdsLibraryPigeonProxyApiRegistrar(
    */
   abstract fun getPigeonApiCompanionAdSlot(): PigeonApiCompanionAdSlot
 
-  /**
-   * An implementation of [PigeonApiAdSlot] used to add a new Dart instance of `AdSlot` to the Dart
-   * `InstanceManager`.
-   */
-  abstract fun getPigeonApiAdSlot(): PigeonApiAdSlot
-
   fun setUp() {
     InteractiveMediaAdsLibraryPigeonInstanceManagerApi.setUpMessageHandlers(
         binaryMessenger, instanceManager)
@@ -652,7 +646,6 @@ abstract class InteractiveMediaAdsLibraryPigeonProxyApiRegistrar(
     PigeonApiCompanionAdSlotClickListener.setUpMessageHandlers(
         binaryMessenger, getPigeonApiCompanionAdSlotClickListener())
     PigeonApiCompanionAdSlot.setUpMessageHandlers(binaryMessenger, getPigeonApiCompanionAdSlot())
-    PigeonApiAdSlot.setUpMessageHandlers(binaryMessenger, getPigeonApiAdSlot())
   }
 
   fun tearDown() {
@@ -678,7 +671,6 @@ abstract class InteractiveMediaAdsLibraryPigeonProxyApiRegistrar(
     PigeonApiAdsRenderingSettings.setUpMessageHandlers(binaryMessenger, null)
     PigeonApiCompanionAdSlotClickListener.setUpMessageHandlers(binaryMessenger, null)
     PigeonApiCompanionAdSlot.setUpMessageHandlers(binaryMessenger, null)
-    PigeonApiAdSlot.setUpMessageHandlers(binaryMessenger, null)
   }
 }
 
@@ -925,12 +917,6 @@ private class InteractiveMediaAdsLibraryPigeonProxyApiBaseCodec(
       registrar.getPigeonApiCompanionAdSlot().pigeon_newInstance(value) {
         if (it.isFailure) {
           logNewInstanceFailure("CompanionAdSlot", value, it.exceptionOrNull())
-        }
-      }
-    } else if (value is com.google.ads.interactivemedia.v3.api.AdSlot) {
-      registrar.getPigeonApiAdSlot().pigeon_newInstance(value) {
-        if (it.isFailure) {
-          logNewInstanceFailure("AdSlot", value, it.exceptionOrNull())
         }
       }
     }
@@ -6597,7 +6583,7 @@ abstract class PigeonApiCompanionAdSlotClickListener(
   }
 }
 /**
- * A companion ad slot for the SDK to render ads.
+ * A companion ad slot for which the SDK should retrieve ads.
  *
  * See
  * https://developers.google.com/interactive-media-ads/docs/sdks/android/client-side/api/reference/com/google/ads/interactivemedia/v3/api/CompanionAdSlot.html.
@@ -6612,11 +6598,66 @@ abstract class PigeonApiCompanionAdSlot(
       clickListener: com.google.ads.interactivemedia.v3.api.CompanionAdSlot.ClickListener
   )
 
+  /**
+   * Returns the ViewGroup into which the companion will be rendered.
+   *
+   * Null until a container has been assigned with [setContainer]. IMA annotated this `@NonNull` up
+   * to 3.35.1 and `@Nullable` from 3.38.0, so the nullable type is the one that holds for both
+   * contracts.
+   */
+  abstract fun getContainer(
+      pigeon_instance: com.google.ads.interactivemedia.v3.api.CompanionAdSlot
+  ): android.view.ViewGroup?
+
+  /** Returns the height of the companion slot. */
+  abstract fun getHeight(
+      pigeon_instance: com.google.ads.interactivemedia.v3.api.CompanionAdSlot
+  ): Long
+
+  /** Returns the width of the companion slot. */
+  abstract fun getWidth(
+      pigeon_instance: com.google.ads.interactivemedia.v3.api.CompanionAdSlot
+  ): Long
+
+  /** Returns true if the companion slot is filled, false otherwise. */
+  abstract fun isFilled(
+      pigeon_instance: com.google.ads.interactivemedia.v3.api.CompanionAdSlot
+  ): Boolean
+
   /** Removes a listener for companion clicks. */
   abstract fun removeClickListener(
       pigeon_instance: com.google.ads.interactivemedia.v3.api.CompanionAdSlot,
       clickListener: com.google.ads.interactivemedia.v3.api.CompanionAdSlot.ClickListener
   )
+
+  /**
+   * Sets the ViewGroup into which the companion will be rendered.
+   *
+   * Required.
+   */
+  abstract fun setContainer(
+      pigeon_instance: com.google.ads.interactivemedia.v3.api.CompanionAdSlot,
+      container: android.view.ViewGroup
+  )
+
+  /**
+   * Sets the size of the slot.
+   *
+   * Only companions matching the slot size will be displayed in the slot.
+   */
+  abstract fun setSize(
+      pigeon_instance: com.google.ads.interactivemedia.v3.api.CompanionAdSlot,
+      width: Long,
+      height: Long
+  )
+
+  /**
+   * Sets the size of the slot as fluid.
+   *
+   * This is a convenience method that sets both parameters of [setSize] to
+   * [CompanionAdSlot.FLUID_SIZE](https://developers.google.com/interactive-media-ads/docs/sdks/android/client-side/api/reference/com/google/ads/interactivemedia/v3/api/CompanionAdSlot#FLUID_SIZE()).
+   */
+  abstract fun setFluidSize(pigeon_instance: com.google.ads.interactivemedia.v3.api.CompanionAdSlot)
 
   companion object {
     @Suppress("LocalVariableName")
@@ -6652,6 +6693,98 @@ abstract class PigeonApiCompanionAdSlot(
         val channel =
             BasicMessageChannel<Any?>(
                 binaryMessenger,
+                "dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.getContainer",
+                codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val pigeon_instanceArg =
+                args[0] as com.google.ads.interactivemedia.v3.api.CompanionAdSlot
+            val wrapped: List<Any?> =
+                try {
+                  listOf(api.getContainer(pigeon_instanceArg))
+                } catch (exception: Throwable) {
+                  InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
+                }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel =
+            BasicMessageChannel<Any?>(
+                binaryMessenger,
+                "dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.getHeight",
+                codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val pigeon_instanceArg =
+                args[0] as com.google.ads.interactivemedia.v3.api.CompanionAdSlot
+            val wrapped: List<Any?> =
+                try {
+                  listOf(api.getHeight(pigeon_instanceArg))
+                } catch (exception: Throwable) {
+                  InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
+                }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel =
+            BasicMessageChannel<Any?>(
+                binaryMessenger,
+                "dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.getWidth",
+                codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val pigeon_instanceArg =
+                args[0] as com.google.ads.interactivemedia.v3.api.CompanionAdSlot
+            val wrapped: List<Any?> =
+                try {
+                  listOf(api.getWidth(pigeon_instanceArg))
+                } catch (exception: Throwable) {
+                  InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
+                }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel =
+            BasicMessageChannel<Any?>(
+                binaryMessenger,
+                "dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.isFilled",
+                codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val pigeon_instanceArg =
+                args[0] as com.google.ads.interactivemedia.v3.api.CompanionAdSlot
+            val wrapped: List<Any?> =
+                try {
+                  listOf(api.isFilled(pigeon_instanceArg))
+                } catch (exception: Throwable) {
+                  InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
+                }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel =
+            BasicMessageChannel<Any?>(
+                binaryMessenger,
                 "dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.removeClickListener",
                 codec)
         if (api != null) {
@@ -6664,6 +6797,81 @@ abstract class PigeonApiCompanionAdSlot(
             val wrapped: List<Any?> =
                 try {
                   api.removeClickListener(pigeon_instanceArg, clickListenerArg)
+                  listOf(null)
+                } catch (exception: Throwable) {
+                  InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
+                }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel =
+            BasicMessageChannel<Any?>(
+                binaryMessenger,
+                "dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.setContainer",
+                codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val pigeon_instanceArg =
+                args[0] as com.google.ads.interactivemedia.v3.api.CompanionAdSlot
+            val containerArg = args[1] as android.view.ViewGroup
+            val wrapped: List<Any?> =
+                try {
+                  api.setContainer(pigeon_instanceArg, containerArg)
+                  listOf(null)
+                } catch (exception: Throwable) {
+                  InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
+                }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel =
+            BasicMessageChannel<Any?>(
+                binaryMessenger,
+                "dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.setSize",
+                codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val pigeon_instanceArg =
+                args[0] as com.google.ads.interactivemedia.v3.api.CompanionAdSlot
+            val widthArg = args[1] as Long
+            val heightArg = args[2] as Long
+            val wrapped: List<Any?> =
+                try {
+                  api.setSize(pigeon_instanceArg, widthArg, heightArg)
+                  listOf(null)
+                } catch (exception: Throwable) {
+                  InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
+                }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel =
+            BasicMessageChannel<Any?>(
+                binaryMessenger,
+                "dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.setFluidSize",
+                codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val pigeon_instanceArg =
+                args[0] as com.google.ads.interactivemedia.v3.api.CompanionAdSlot
+            val wrapped: List<Any?> =
+                try {
+                  api.setFluidSize(pigeon_instanceArg)
                   listOf(null)
                 } catch (exception: Throwable) {
                   InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
@@ -6696,260 +6904,6 @@ abstract class PigeonApiCompanionAdSlot(
       val codec = pigeonRegistrar.codec
       val channelName =
           "dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.pigeon_newInstance"
-      val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-      channel.send(listOf(pigeon_identifierArg)) {
-        if (it is List<*>) {
-          if (it.size > 1) {
-            callback(
-                Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
-          } else {
-            callback(Result.success(Unit))
-          }
-        } else {
-          callback(
-              Result.failure(
-                  InteractiveMediaAdsLibraryPigeonUtils.createConnectionError(channelName)))
-        }
-      }
-    }
-  }
-
-  @Suppress("FunctionName")
-  /** An implementation of [PigeonApiAdSlot] used to access callback methods */
-  fun pigeon_getPigeonApiAdSlot(): PigeonApiAdSlot {
-    return pigeonRegistrar.getPigeonApiAdSlot()
-  }
-}
-/**
- * An ad slot for the SDK to render ads.
- *
- * See
- * https://developers.google.com/interactive-media-ads/docs/sdks/android/client-side/api/reference/com/google/ads/interactivemedia/v3/api/AdSlot.html.
- */
-@Suppress("UNCHECKED_CAST")
-abstract class PigeonApiAdSlot(
-    open val pigeonRegistrar: InteractiveMediaAdsLibraryPigeonProxyApiRegistrar
-) {
-  /** Returns the ViewGroup into which the companion will be rendered. */
-  abstract fun getContainer(
-      pigeon_instance: com.google.ads.interactivemedia.v3.api.AdSlot
-  ): android.view.ViewGroup?
-
-  /** Returns the height of the ad slot. */
-  abstract fun getHeight(pigeon_instance: com.google.ads.interactivemedia.v3.api.AdSlot): Long
-
-  /** Returns the width of the ad slot. */
-  abstract fun getWidth(pigeon_instance: com.google.ads.interactivemedia.v3.api.AdSlot): Long
-
-  /** Returns true if the ad slot is filled, false otherwise. */
-  abstract fun isFilled(pigeon_instance: com.google.ads.interactivemedia.v3.api.AdSlot): Boolean
-
-  /**
-   * Sets the ad slot's ViewGroup instance for the SDK to render ads.
-   *
-   * Required.
-   */
-  abstract fun setContainer(
-      pigeon_instance: com.google.ads.interactivemedia.v3.api.AdSlot,
-      container: android.view.ViewGroup
-  )
-
-  /**
-   * Sets the size of the ad slot.
-   *
-   * Only companions matching the slot size will be displayed in the slot.
-   */
-  abstract fun setSize(
-      pigeon_instance: com.google.ads.interactivemedia.v3.api.AdSlot,
-      width: Long,
-      height: Long
-  )
-
-  /**
-   * Sets the size of the ad slot as fluid.
-   *
-   * This is a convenience method that sets both parameters of [setSize] to
-   * [CompanionAdSlot.FLUID_SIZE](https://developers.google.com/interactive-media-ads/docs/sdks/android/client-side/api/reference/com/google/ads/interactivemedia/v3/api/CompanionAdSlot#FLUID_SIZE()).
-   */
-  abstract fun setFluidSize(pigeon_instance: com.google.ads.interactivemedia.v3.api.AdSlot)
-
-  companion object {
-    @Suppress("LocalVariableName")
-    fun setUpMessageHandlers(binaryMessenger: BinaryMessenger, api: PigeonApiAdSlot?) {
-      val codec = api?.pigeonRegistrar?.codec ?: InteractiveMediaAdsLibraryPigeonCodec()
-      run {
-        val channel =
-            BasicMessageChannel<Any?>(
-                binaryMessenger,
-                "dev.flutter.pigeon.interactive_media_ads.AdSlot.getContainer",
-                codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val pigeon_instanceArg = args[0] as com.google.ads.interactivemedia.v3.api.AdSlot
-            val wrapped: List<Any?> =
-                try {
-                  listOf(api.getContainer(pigeon_instanceArg))
-                } catch (exception: Throwable) {
-                  InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
-                }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel =
-            BasicMessageChannel<Any?>(
-                binaryMessenger, "dev.flutter.pigeon.interactive_media_ads.AdSlot.getHeight", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val pigeon_instanceArg = args[0] as com.google.ads.interactivemedia.v3.api.AdSlot
-            val wrapped: List<Any?> =
-                try {
-                  listOf(api.getHeight(pigeon_instanceArg))
-                } catch (exception: Throwable) {
-                  InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
-                }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel =
-            BasicMessageChannel<Any?>(
-                binaryMessenger, "dev.flutter.pigeon.interactive_media_ads.AdSlot.getWidth", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val pigeon_instanceArg = args[0] as com.google.ads.interactivemedia.v3.api.AdSlot
-            val wrapped: List<Any?> =
-                try {
-                  listOf(api.getWidth(pigeon_instanceArg))
-                } catch (exception: Throwable) {
-                  InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
-                }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel =
-            BasicMessageChannel<Any?>(
-                binaryMessenger, "dev.flutter.pigeon.interactive_media_ads.AdSlot.isFilled", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val pigeon_instanceArg = args[0] as com.google.ads.interactivemedia.v3.api.AdSlot
-            val wrapped: List<Any?> =
-                try {
-                  listOf(api.isFilled(pigeon_instanceArg))
-                } catch (exception: Throwable) {
-                  InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
-                }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel =
-            BasicMessageChannel<Any?>(
-                binaryMessenger,
-                "dev.flutter.pigeon.interactive_media_ads.AdSlot.setContainer",
-                codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val pigeon_instanceArg = args[0] as com.google.ads.interactivemedia.v3.api.AdSlot
-            val containerArg = args[1] as android.view.ViewGroup
-            val wrapped: List<Any?> =
-                try {
-                  api.setContainer(pigeon_instanceArg, containerArg)
-                  listOf(null)
-                } catch (exception: Throwable) {
-                  InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
-                }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel =
-            BasicMessageChannel<Any?>(
-                binaryMessenger, "dev.flutter.pigeon.interactive_media_ads.AdSlot.setSize", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val pigeon_instanceArg = args[0] as com.google.ads.interactivemedia.v3.api.AdSlot
-            val widthArg = args[1] as Long
-            val heightArg = args[2] as Long
-            val wrapped: List<Any?> =
-                try {
-                  api.setSize(pigeon_instanceArg, widthArg, heightArg)
-                  listOf(null)
-                } catch (exception: Throwable) {
-                  InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
-                }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel =
-            BasicMessageChannel<Any?>(
-                binaryMessenger,
-                "dev.flutter.pigeon.interactive_media_ads.AdSlot.setFluidSize",
-                codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val pigeon_instanceArg = args[0] as com.google.ads.interactivemedia.v3.api.AdSlot
-            val wrapped: List<Any?> =
-                try {
-                  api.setFluidSize(pigeon_instanceArg)
-                  listOf(null)
-                } catch (exception: Throwable) {
-                  InteractiveMediaAdsLibraryPigeonUtils.wrapError(exception)
-                }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-    }
-  }
-
-  @Suppress("LocalVariableName", "FunctionName")
-  /** Creates a Dart instance of AdSlot and attaches it to [pigeon_instanceArg]. */
-  fun pigeon_newInstance(
-      pigeon_instanceArg: com.google.ads.interactivemedia.v3.api.AdSlot,
-      callback: (Result<Unit>) -> Unit
-  ) {
-    if (pigeonRegistrar.ignoreCallsToDart) {
-      callback(
-          Result.failure(
-              FlutterError("ignore-calls-error", "Calls to Dart are being ignored.", "")))
-    } else if (pigeonRegistrar.instanceManager.containsInstance(pigeon_instanceArg)) {
-      callback(Result.success(Unit))
-    } else {
-      val pigeon_identifierArg =
-          pigeonRegistrar.instanceManager.addHostCreatedInstance(pigeon_instanceArg)
-      val binaryMessenger = pigeonRegistrar.binaryMessenger
-      val codec = pigeonRegistrar.codec
-      val channelName = "dev.flutter.pigeon.interactive_media_ads.AdSlot.pigeon_newInstance"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(pigeon_identifierArg)) {
         if (it is List<*>) {

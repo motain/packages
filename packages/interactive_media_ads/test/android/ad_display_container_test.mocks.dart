@@ -315,27 +315,6 @@ class MockCompanionAdSlot extends _i1.Mock implements _i2.CompanionAdSlot {
           as _i5.Future<void>);
 
   @override
-  _i5.Future<void> removeClickListener(_i2.CompanionAdSlotClickListener? clickListener) =>
-      (super.noSuchMethod(
-            Invocation.method(#removeClickListener, [clickListener]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
-          )
-          as _i5.Future<void>);
-
-  @override
-  _i2.CompanionAdSlot pigeon_copy() =>
-      (super.noSuchMethod(
-            Invocation.method(#pigeon_copy, []),
-            returnValue: _FakeCompanionAdSlot_4(this, Invocation.method(#pigeon_copy, [])),
-            returnValueForMissingStub: _FakeCompanionAdSlot_4(
-              this,
-              Invocation.method(#pigeon_copy, []),
-            ),
-          )
-          as _i2.CompanionAdSlot);
-
-  @override
   _i5.Future<_i2.ViewGroup?> getContainer() =>
       (super.noSuchMethod(
             Invocation.method(#getContainer, []),
@@ -372,6 +351,15 @@ class MockCompanionAdSlot extends _i1.Mock implements _i2.CompanionAdSlot {
           as _i5.Future<bool>);
 
   @override
+  _i5.Future<void> removeClickListener(_i2.CompanionAdSlotClickListener? clickListener) =>
+      (super.noSuchMethod(
+            Invocation.method(#removeClickListener, [clickListener]),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
+
+  @override
   _i5.Future<void> setContainer(_i2.ViewGroup? container) =>
       (super.noSuchMethod(
             Invocation.method(#setContainer, [container]),
@@ -397,6 +385,18 @@ class MockCompanionAdSlot extends _i1.Mock implements _i2.CompanionAdSlot {
             returnValueForMissingStub: _i5.Future<void>.value(),
           )
           as _i5.Future<void>);
+
+  @override
+  _i2.CompanionAdSlot pigeon_copy() =>
+      (super.noSuchMethod(
+            Invocation.method(#pigeon_copy, []),
+            returnValue: _FakeCompanionAdSlot_4(this, Invocation.method(#pigeon_copy, [])),
+            returnValueForMissingStub: _FakeCompanionAdSlot_4(
+              this,
+              Invocation.method(#pigeon_copy, []),
+            ),
+          )
+          as _i2.CompanionAdSlot);
 }
 
 /// A class which mocks [FrameLayout].

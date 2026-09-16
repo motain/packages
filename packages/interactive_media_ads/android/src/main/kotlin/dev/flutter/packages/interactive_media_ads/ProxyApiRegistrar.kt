@@ -161,8 +161,4 @@ open class ProxyApiRegistrar(binaryMessenger: BinaryMessenger, var context: Cont
   override fun getPigeonApiCompanionAdSlot(): PigeonApiCompanionAdSlot {
     return CompanionAdSlotProxyApi(this)
   }
-
-  override fun getPigeonApiAdSlot(): PigeonApiAdSlot {
-    return AdSlotProxyApi(this)
-  }
 }

@@ -1,3 +1,10 @@
+## 0.3.2
+
+* Removes the `AdSlot` ProxyApi and moves its members back onto
+  `CompanionAdSlot` so the plugin compiles against IMA Android SDK 3.35.1.
+  `CompanionAdSlot.getContainer` stays nullable to match both the 3.35.1
+  (`@NonNull`) and 3.38.0+ (`@Nullable`) SDK contracts.
+
 ## 0.3.1
 
 * Adds support for setting the volume of ads. See `AdsManager.setVolume`.

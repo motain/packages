@@ -289,7 +289,6 @@ class PigeonInstanceManager {
       pigeon_instanceManager: instanceManager,
     );
     CompanionAdSlot.pigeon_setUpMessageHandlers(pigeon_instanceManager: instanceManager);
-    AdSlot.pigeon_setUpMessageHandlers(pigeon_instanceManager: instanceManager);
     return instanceManager;
   }
 
@@ -6209,17 +6208,16 @@ class CompanionAdSlotClickListener extends PigeonInternalProxyApiBaseClass {
   }
 }
 
-/// A companion ad slot for the SDK to render ads.
+/// A companion ad slot for which the SDK should retrieve ads.
 ///
 /// See https://developers.google.com/interactive-media-ads/docs/sdks/android/client-side/api/reference/com/google/ads/interactivemedia/v3/api/CompanionAdSlot.html.
-class CompanionAdSlot extends AdSlot {
+class CompanionAdSlot extends PigeonInternalProxyApiBaseClass {
   /// Constructs [CompanionAdSlot] without creating the associated native object.
   ///
   /// This should only be used by subclasses created by this library or to
   /// create copies for an [PigeonInstanceManager].
   @protected
-  CompanionAdSlot.pigeon_detached({super.pigeon_binaryMessenger, super.pigeon_instanceManager})
-    : super.pigeon_detached();
+  CompanionAdSlot.pigeon_detached({super.pigeon_binaryMessenger, super.pigeon_instanceManager});
 
   late final _PigeonInternalProxyApiBaseCodec _pigeonVar_codecCompanionAdSlot =
       _PigeonInternalProxyApiBaseCodec(pigeon_instanceManager);
@@ -6288,6 +6286,98 @@ class CompanionAdSlot extends AdSlot {
     _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
   }
 
+  /// Returns the ViewGroup into which the companion will be rendered.
+  ///
+  /// Null until a container has been assigned with [setContainer]. IMA
+  /// annotated this `@NonNull` up to 3.35.1 and `@Nullable` from 3.38.0, so
+  /// the nullable type is the one that holds for both contracts.
+  Future<ViewGroup?> getContainer() async {
+    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecCompanionAdSlot;
+    final BinaryMessenger? pigeonVar_binaryMessenger = pigeon_binaryMessenger;
+    const pigeonVar_channelName =
+        'dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.getContainer';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[this]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
+    return pigeonVar_replyValue as ViewGroup?;
+  }
+
+  /// Returns the height of the companion slot.
+  Future<int> getHeight() async {
+    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecCompanionAdSlot;
+    final BinaryMessenger? pigeonVar_binaryMessenger = pigeon_binaryMessenger;
+    const pigeonVar_channelName =
+        'dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.getHeight';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[this]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as int;
+  }
+
+  /// Returns the width of the companion slot.
+  Future<int> getWidth() async {
+    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecCompanionAdSlot;
+    final BinaryMessenger? pigeonVar_binaryMessenger = pigeon_binaryMessenger;
+    const pigeonVar_channelName =
+        'dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.getWidth';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[this]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as int;
+  }
+
+  /// Returns true if the companion slot is filled, false otherwise.
+  Future<bool> isFilled() async {
+    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecCompanionAdSlot;
+    final BinaryMessenger? pigeonVar_binaryMessenger = pigeon_binaryMessenger;
+    const pigeonVar_channelName =
+        'dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.isFilled';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[this]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as bool;
+  }
+
   /// Removes a listener for companion clicks.
   Future<void> removeClickListener(CompanionAdSlotClickListener clickListener) async {
     final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecCompanionAdSlot;
@@ -6308,164 +6398,14 @@ class CompanionAdSlot extends AdSlot {
     _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
   }
 
-  @override
-  CompanionAdSlot pigeon_copy() {
-    return CompanionAdSlot.pigeon_detached(
-      pigeon_binaryMessenger: pigeon_binaryMessenger,
-      pigeon_instanceManager: pigeon_instanceManager,
-    );
-  }
-}
-
-/// An ad slot for the SDK to render ads.
-///
-/// See https://developers.google.com/interactive-media-ads/docs/sdks/android/client-side/api/reference/com/google/ads/interactivemedia/v3/api/AdSlot.html.
-class AdSlot extends PigeonInternalProxyApiBaseClass {
-  /// Constructs [AdSlot] without creating the associated native object.
-  ///
-  /// This should only be used by subclasses created by this library or to
-  /// create copies for an [PigeonInstanceManager].
-  @protected
-  AdSlot.pigeon_detached({super.pigeon_binaryMessenger, super.pigeon_instanceManager});
-
-  late final _PigeonInternalProxyApiBaseCodec _pigeonVar_codecAdSlot =
-      _PigeonInternalProxyApiBaseCodec(pigeon_instanceManager);
-
-  static void pigeon_setUpMessageHandlers({
-    bool pigeon_clearHandlers = false,
-    BinaryMessenger? pigeon_binaryMessenger,
-    PigeonInstanceManager? pigeon_instanceManager,
-    AdSlot Function()? pigeon_newInstance,
-  }) {
-    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _PigeonInternalProxyApiBaseCodec(
-      pigeon_instanceManager ?? PigeonInstanceManager.instance,
-    );
-    final BinaryMessenger? binaryMessenger = pigeon_binaryMessenger;
-    {
-      final pigeonVar_channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.interactive_media_ads.AdSlot.pigeon_newInstance',
-        pigeonChannelCodec,
-        binaryMessenger: binaryMessenger,
-      );
-      if (pigeon_clearHandlers) {
-        pigeonVar_channel.setMessageHandler(null);
-      } else {
-        pigeonVar_channel.setMessageHandler((Object? message) async {
-          final List<Object?> args = message! as List<Object?>;
-          final int arg_pigeon_instanceIdentifier = args[0]! as int;
-          try {
-            (pigeon_instanceManager ?? PigeonInstanceManager.instance).addHostCreatedInstance(
-              pigeon_newInstance?.call() ??
-                  AdSlot.pigeon_detached(
-                    pigeon_binaryMessenger: pigeon_binaryMessenger,
-                    pigeon_instanceManager: pigeon_instanceManager,
-                  ),
-              arg_pigeon_instanceIdentifier,
-            );
-            return wrapResponse(empty: true);
-          } on PlatformException catch (e) {
-            return wrapResponse(error: e);
-          } catch (e) {
-            return wrapResponse(
-              error: PlatformException(code: 'error', message: e.toString()),
-            );
-          }
-        });
-      }
-    }
-  }
-
-  /// Returns the ViewGroup into which the companion will be rendered.
-  Future<ViewGroup?> getContainer() async {
-    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecAdSlot;
-    final BinaryMessenger? pigeonVar_binaryMessenger = pigeon_binaryMessenger;
-    const pigeonVar_channelName = 'dev.flutter.pigeon.interactive_media_ads.AdSlot.getContainer';
-    final pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[this]);
-    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
-
-    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: true,
-    );
-    return pigeonVar_replyValue as ViewGroup?;
-  }
-
-  /// Returns the height of the ad slot.
-  Future<int> getHeight() async {
-    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecAdSlot;
-    final BinaryMessenger? pigeonVar_binaryMessenger = pigeon_binaryMessenger;
-    const pigeonVar_channelName = 'dev.flutter.pigeon.interactive_media_ads.AdSlot.getHeight';
-    final pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[this]);
-    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
-
-    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: false,
-    );
-    return pigeonVar_replyValue! as int;
-  }
-
-  /// Returns the width of the ad slot.
-  Future<int> getWidth() async {
-    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecAdSlot;
-    final BinaryMessenger? pigeonVar_binaryMessenger = pigeon_binaryMessenger;
-    const pigeonVar_channelName = 'dev.flutter.pigeon.interactive_media_ads.AdSlot.getWidth';
-    final pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[this]);
-    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
-
-    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: false,
-    );
-    return pigeonVar_replyValue! as int;
-  }
-
-  /// Returns true if the ad slot is filled, false otherwise.
-  Future<bool> isFilled() async {
-    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecAdSlot;
-    final BinaryMessenger? pigeonVar_binaryMessenger = pigeon_binaryMessenger;
-    const pigeonVar_channelName = 'dev.flutter.pigeon.interactive_media_ads.AdSlot.isFilled';
-    final pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[this]);
-    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
-
-    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-      pigeonVar_replyList,
-      pigeonVar_channelName,
-      isNullValid: false,
-    );
-    return pigeonVar_replyValue! as bool;
-  }
-
-  /// Sets the ad slot's ViewGroup instance for the SDK to render ads.
+  /// Sets the ViewGroup into which the companion will be rendered.
   ///
   /// Required.
   Future<void> setContainer(ViewGroup container) async {
-    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecAdSlot;
+    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecCompanionAdSlot;
     final BinaryMessenger? pigeonVar_binaryMessenger = pigeon_binaryMessenger;
-    const pigeonVar_channelName = 'dev.flutter.pigeon.interactive_media_ads.AdSlot.setContainer';
+    const pigeonVar_channelName =
+        'dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.setContainer';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -6477,13 +6417,14 @@ class AdSlot extends PigeonInternalProxyApiBaseClass {
     _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
   }
 
-  /// Sets the size of the ad slot.
+  /// Sets the size of the slot.
   ///
   /// Only companions matching the slot size will be displayed in the slot.
   Future<void> setSize(int width, int height) async {
-    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecAdSlot;
+    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecCompanionAdSlot;
     final BinaryMessenger? pigeonVar_binaryMessenger = pigeon_binaryMessenger;
-    const pigeonVar_channelName = 'dev.flutter.pigeon.interactive_media_ads.AdSlot.setSize';
+    const pigeonVar_channelName =
+        'dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.setSize';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -6499,14 +6440,15 @@ class AdSlot extends PigeonInternalProxyApiBaseClass {
     _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
   }
 
-  /// Sets the size of the ad slot as fluid.
+  /// Sets the size of the slot as fluid.
   ///
   /// This is a convenience method that sets both parameters of [setSize] to
   /// [CompanionAdSlot.FLUID_SIZE](https://developers.google.com/interactive-media-ads/docs/sdks/android/client-side/api/reference/com/google/ads/interactivemedia/v3/api/CompanionAdSlot#FLUID_SIZE()).
   Future<void> setFluidSize() async {
-    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecAdSlot;
+    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec = _pigeonVar_codecCompanionAdSlot;
     final BinaryMessenger? pigeonVar_binaryMessenger = pigeon_binaryMessenger;
-    const pigeonVar_channelName = 'dev.flutter.pigeon.interactive_media_ads.AdSlot.setFluidSize';
+    const pigeonVar_channelName =
+        'dev.flutter.pigeon.interactive_media_ads.CompanionAdSlot.setFluidSize';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -6519,8 +6461,8 @@ class AdSlot extends PigeonInternalProxyApiBaseClass {
   }
 
   @override
-  AdSlot pigeon_copy() {
-    return AdSlot.pigeon_detached(
+  CompanionAdSlot pigeon_copy() {
+    return CompanionAdSlot.pigeon_detached(
       pigeon_binaryMessenger: pigeon_binaryMessenger,
       pigeon_instanceManager: pigeon_instanceManager,
     );
